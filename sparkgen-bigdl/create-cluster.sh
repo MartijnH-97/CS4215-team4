@@ -1,0 +1,1 @@
+gcloud dataproc clusters create cs4215-team4-cluster-martijn --region europe-west1 --subnet default --zone europe-west1-d --master-machine-type custom-1-3584 --master-boot-disk-size 15 --num-workers 2 --worker-machine-type custom-1-3584 --worker-boot-disk-size 15 --image-version 1.3-deb9 --project cs4215-team4 --max-idle 2h

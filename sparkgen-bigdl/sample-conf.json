@@ -1,0 +1,36 @@
+{
+  "jobClassParameters" : [
+    {
+        "systemParameters": {
+            "driverCores": "4",
+            "driverMemory": "3G",
+            "totalExecutorCores": "4",
+            "executorCores": "4",
+            "executorMemory": "3G",
+            "pyFiles": "/home/test/bd/spark/lib/bigdl-0.8.0-python-api.zip,/home/test/bd/codes/lenet5.py",
+            "propertiesFile": "/home/test/bd/spark/conf/spark-bigdl.conf",
+            "jars": "/home/test/bd/spark/lib/bigdl-SPARK_2.3-0.8.0-jar-with-dependencies.jar",
+            "conf": [
+                "spark.driver.extraClassPath=/home/test/bd/spark/lib/bigdl-SPARK_2.3-0.8.0-jar-with-dependencies.jar", 
+                "spark.executer.extraClassPath=bigdl-SPARK_2.3-0.8.0-jar-with-dependencies.jar /home/test/bd/codes/lenet5.py"
+            ],
+            "action": "train",
+            "dataPath": "/tmp/mnist"
+        },
+        "hyperParameters": {
+            "batchSize": "64",
+            "maxEpoch": "2",
+            "learningRate": "0.01",
+            "learningrateDecay": "0.0002"
+        },
+        "classProbability": 1,
+        "priorities": [
+            {"priority": 1, "probability": 1}
+        ]
+    }
+  ],
+  "master": "spark://localhost:7077",
+  "lambda" : 0.01,
+  "runtime" : 3600,
+  "preemptJobs" : 0
+}
