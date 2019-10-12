@@ -28,3 +28,5 @@ sparkgen-bigdl/src/config/
 sparkgen-bigdl/src/setenv.sh
 
 sparkgen-bigdl/setenv.sh
+
+sparkgen-bigdl/results/

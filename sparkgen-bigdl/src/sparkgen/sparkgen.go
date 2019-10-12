@@ -14,7 +14,15 @@ import (
 	"sync"
 	"os"
 	"bytes"
+	"encoding/csv"
 )
+
+// Code duplication from job struct, but I dont want to have the whole command stored if that's not needed.
+type result struct {
+	gen string
+	start string
+	end string
+}
 
 type job struct {
 	gen float64
@@ -74,6 +82,7 @@ var record bool = false
 var recordDir string = ""
 var configFileName string = ""
 var lambda float64 = 0.001
+var results []result = nil
 
 var gcp_cluster string = "cs4215-team4-cluster-martijn"
 
@@ -166,6 +175,12 @@ func logger(j *job, cmd *exec.Cmd, lid float32) {
 	}
 	// class,success,gen,start,end
 	fmt.Printf("%d,%d,%t,%f,%f,%f\n", j.class, j.id, err == nil, j.gen, j.start, j.end)
+
+	var gen = fmt.Sprintf("%f", j.gen)
+	var start = fmt.Sprintf("%f", j.start)
+	var end = fmt.Sprintf("%f", j.end)
+	result := result{gen, start, end}
+	results = append(results, result)
 }
 
 func dispatch(j *job, lid float32) *exec.Cmd {
@@ -375,6 +390,34 @@ func contains(array []int, item int) bool {
 	return false
 }
 
+func checkError(message string, err error) {
+    if err != nil {
+        log.Fatal(message, err)
+    }
+}
+
+func writeResultsToDisk() {
+	err := os.MkdirAll("results", 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	t := time.Now()
+	file, err := os.Create("results/"+ t.String() +"_result.csv")
+    	checkError("Cannot create file", err)
+    	defer file.Close()
+
+    	writer := csv.NewWriter(file)
+    	defer writer.Flush()
+
+    	for _, value := range results {
+		x := []string{value.gen, value.start, value.end}
+     	 	err := writer.Write(x)
+        	checkError("Cannot write to file", err)
+    	}
+
+}
+
 func main() {
 	// Parse cmdline options
 	flag.Parse()
@@ -474,6 +517,10 @@ func main() {
 	// Run for runtime seconds
 	log.Printf("Running for %d seconds\n", runtime)
 	time.Sleep(time.Duration(runtime) * time.Second)
+
+	// Write results to disk
+	log.Printf("Writing results to disk ...")
+	go writeResultsToDisk()
 
 	// Wait for shut down
 	log.Printf("Shutting down ...")
