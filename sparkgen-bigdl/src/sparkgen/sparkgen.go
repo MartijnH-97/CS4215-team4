@@ -83,6 +83,8 @@ var recordDir string = ""
 var configFileName string = ""
 var lambda float64 = 0.001
 var results []result = nil
+var numberOfEpochs int = -1
+var numberOfNodes int = -1
 
 var gcp_cluster string = "cs4215-team4-cluster-martijn"
 
@@ -91,6 +93,9 @@ func init() {
 	flag.StringVar(&configFileName, "c", "conf.json", "config file")
 	flag.BoolVar(&debug, "d", false, "debug logging")
 	flag.BoolVar(&record, "r", false, "record output")
+	flag.IntVar(&numberOfEpochs, "e", -1, "Maximum number of epochs")
+	flag.IntVar(&numberOfNodes, "n", -1, "Number of nodes")
+	flag.Float64Var(&lambda, "l", -1, "Arrival rate")
 }
 
 func generator() {
@@ -363,6 +368,7 @@ func cmd(master string,
 	//fmt.Fprintf(&buffer, "spark-submit --master %s ", master)
 	//fmt.Fprintf(&buffer, "--driver-cores %s ", driverCores)
 	//fmt.Fprintf(&buffer, "--driver-memory %s ", driverMemory)
+
 	//fmt.Fprintf(&buffer, "--total-executor-cores %s ", totalExecutorCores)
 	//fmt.Fprintf(&buffer, "--executor-cores %s ", executorCores)
 	//fmt.Fprintf(&buffer, "--executor-memory %s ", executorMemory)
@@ -471,7 +477,11 @@ func main() {
 
 	preempt = config.PreemptJobs
 	runtime := config.Runtime
-	lambda = config.Lambda
+	//lambda = config.Lambda
+
+	log.Printf("Number of epochs: %d", numberOfEpochs)
+	log.Printf("Number of nodes: %d", numberOfNodes)
+	log.Printf("Lambda: %d", lambda)
 
 	if len(jobCmds) == 0 {
 		log.Fatalf("No job class command lines defined!")
