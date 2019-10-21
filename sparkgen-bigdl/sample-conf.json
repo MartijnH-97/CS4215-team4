@@ -2,11 +2,6 @@
   "jobClassParameters" : [
     {
         "systemParameters": {
-            "driverCores": "2",
-            "driverMemory": "3G",
-            "totalExecutorCores": "5",
-            "executorCores": "5",
-            "executorMemory": "8G",
             "pyFiles": "/home/test/bd/spark/lib/bigdl-0.8.0-python-api.zip,/home/test/bd/codes/lenet5.py",
             "propertiesFile": "/home/test/bd/spark/conf/spark-bigdl.conf",
             "jars": "/home/test/bd/spark/lib/bigdl-SPARK_2.3-0.8.0-jar-with-dependencies.jar",
@@ -19,7 +14,6 @@
         },
         "hyperParameters": {
             "batchSize": "256",
-            "maxEpoch": "2",
             "learningRate": "0.01",
             "learningrateDecay": "0.0002"
         },
@@ -30,6 +24,6 @@
     }
   ],
   "master": "spark://localhost:7077",
-  "runtime" : 1000,
+  "runtime" : 1800,
   "preemptJobs" : 0
 }
