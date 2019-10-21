@@ -351,17 +351,19 @@ func cmd(master string,
 	learningRate string, 
 	learningrateDecay string) string {
 	
+	var batchSizeInt, _ =  strconv.Atoi(batchSize)
+	var overflow = batchSizeInt % numberOfNodes
 	var buffer bytes.Buffer
 	fmt.Fprintf(&buffer, "gcloud dataproc jobs submit pyspark /home/test/bd/codes/lenet5.py ")
 	fmt.Fprintf(&buffer, "--cluster %s ", gcp_cluster)
 	fmt.Fprintf(&buffer, "--region %s ", "europe-west1")
 	fmt.Fprintf(&buffer, "--py-files %s ", pyFiles)
 	fmt.Fprintf(&buffer, "--jars %s ", jars)
-	fmt.Fprintf(&buffer, "--properties=%s ", "spark.shuffle.reduceLocality.enabled=false,spark.shuffle.blockTransferService=nio,spark.scheduler.minRegisteredResourcesRatio=1.0,spark.speculation=false,spark.driver.extraClassPath=/home/test/bd/spark/lib/bigdl-SPARK_2.3-0.8.0-jar-with-dependencies.jar,spark.executer.extraClassPath=bigdl-SPARK_2.3-0.8.0-jar-with-dependencies.jar,spark.dynamicAllocation.enabled=false ")
-	fmt.Fprintf(&buffer, " -- ", action)
+	fmt.Fprintf(&buffer, "--properties=spark.shuffle.reduceLocality.enabled=false,spark.shuffle.blockTransferService=nio,spark.scheduler.minRegisteredResourcesRatio=1.0,spark.speculation=false,spark.driver.extraClassPath=/home/test/bd/spark/lib/bigdl-SPARK_2.3-0.8.0-jar-with-dependencies.jar,spark.executer.extraClassPath=bigdl-SPARK_2.3-0.8.0-jar-with-dependencies.jar,spark.dynamicAllocation.enabled=false,spark.executor.instances=%d", numberOfNodes)
+	fmt.Fprintf(&buffer, " -- ")
 	fmt.Fprintf(&buffer, "--action %s ", action)
 	fmt.Fprintf(&buffer, "--dataPath %s ", dataPath)
-	fmt.Fprintf(&buffer, "--batchSize %s ", batchSize)
+	fmt.Fprintf(&buffer, "--batchSize %d ", batchSizeInt - overflow)
 	fmt.Fprintf(&buffer, "--endTriggerNum %s ", maxEpoch)
 	fmt.Fprintf(&buffer, "--learningRate %s ", learningRate)
 	fmt.Fprintf(&buffer, "--learningrateDecay %s ", learningrateDecay)
