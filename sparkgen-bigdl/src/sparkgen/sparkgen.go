@@ -85,6 +85,7 @@ var lambda float64 = 0.001
 var results []result = nil
 var numberOfEpochs int = -1
 var numberOfNodes int = -1
+var experimentFolder string = ""
 
 var gcp_cluster string = "cs4215-team4-cluster-martijn"
 
@@ -96,6 +97,7 @@ func init() {
 	flag.IntVar(&numberOfEpochs, "e", -1, "Maximum number of epochs")
 	flag.IntVar(&numberOfNodes, "n", -1, "Number of nodes")
 	flag.Float64Var(&lambda, "l", -1, "Arrival rate")
+	flag.StringVar(&experimentFolder, "f", "main", "Experiment name")
 }
 
 func generator() {
@@ -403,18 +405,22 @@ func checkError(message string, err error) {
 }
 
 func writeResultsToDisk() {
-	err := os.MkdirAll("results", 0755)
+	err := os.MkdirAll("results/"+experimentFolder, 0755)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	t := time.Now()
-	file, err := os.Create("results/"+ t.String() +"_result.csv")
+	file, err := os.Create("results/"+experimentFolder+"/"+t.String() +"_result.csv")
     	checkError("Cannot create file", err)
     	defer file.Close()
 
     	writer := csv.NewWriter(file)
     	defer writer.Flush()
+
+	x := []string{strconv.FormatFloat(lambda, 'f', -1, 64), strconv.Itoa(numberOfEpochs), strconv.Itoa(numberOfNodes)}
+     	err = writer.Write(x)
+        checkError("Cannot write config values to file", err)
 
     	for _, value := range results {
 		x := []string{value.gen, value.start, value.end}
@@ -481,7 +487,8 @@ func main() {
 
 	log.Printf("Number of epochs: %d", numberOfEpochs)
 	log.Printf("Number of nodes: %d", numberOfNodes)
-	log.Printf("Lambda: %d", lambda)
+	log.Printf("Lambda: %f", lambda)
+	log.Printf("Experiment name: %s", experimentFolder)
 
 	if len(jobCmds) == 0 {
 		log.Fatalf("No job class command lines defined!")
