@@ -163,17 +163,66 @@ print SSA
 print SSB
 print SSC
 
-INTERACTIONS = np.zeros((a, c, b))
+INTERACTIONS_ABC = np.zeros((a, c, b))
 
 for C in range(0, c):
     for B in range(0, b):
         for A in range(0, a):
-            INTERACTIONS[A][B][C] = AVERAGES[A][B][C] - MEANS[0][A] - MEANS[1][B] - MEANS[2][C] + TOTAL_MEAN
+            INTERACTIONS_ABC[A][C][B] = AVERAGES[A][C][B] - MEANS[0][A] - MEANS[1][B] - MEANS[2][C] + TOTAL_MEAN
 
-print INTERACTIONS
+print INTERACTIONS_ABC
 
-## This is the part where I'm stuck right now
-SSAB = INTERACTIONS[0][0]**2 + EFFECTS[0][1]**2
+print "------------------------------------------------------------------"
+INTERACTIONS_AB = np.zeros((a, b))
+for i in range(0, a):
+    for j in range(0, b):
+        sum = 0.0
+        for k in range(0, c):
+            sum += AVERAGES[i][k][j]
+
+        INTERACTIONS_AB[i][j] = sum/c
+
+INTERACTIONS_AC = np.zeros((a, c))
+for i in range(0, a):
+    for k in range(0, c):
+        sum = 0.0
+        for j in range(0, b):
+            sum += AVERAGES[i][k][j]
+
+        INTERACTIONS_AC[i][k] = sum/b
+
+INTERACTIONS_BC = np.zeros((b, c))
+for j in range(0, b):
+    for k in range(0, c):
+        sum = 0.0
+        for i in range(0, a):
+            sum += AVERAGES[i][k][j]
+
+        INTERACTIONS_BC[j][k] = sum/a
+
+sums = 0.0
+for i in range(0, a):
+    for j in range(0, b):
+        part = INTERACTIONS_AB[i][j] - MEANS[0][i] - MEANS[1][j] + TOTAL_MEAN
+        sums += part**2
+SSAB = r*c*sums
+print SSAB
+
+sums = 0.0
+for i in range(0, a):
+    for k in range(0, c):
+        part = INTERACTIONS_AC[i][k] - MEANS[0][i] - MEANS[2][k] + TOTAL_MEAN
+        sums += part**2
+SSAC = r*b*sums
+print SSAC
+
+sums = 0.0
+for j in range(0, b):
+    for k in range(0, c):
+        part = INTERACTIONS_BC[j][k] - MEANS[1][j] - MEANS[2][k] + TOTAL_MEAN
+        sums += part**2
+SSBC = r*a*sums
+print SSBC
 
 
 # # Calculate row and column sums and means.
