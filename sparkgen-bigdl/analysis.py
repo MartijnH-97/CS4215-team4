@@ -172,7 +172,6 @@ for C in range(0, c):
 
 print INTERACTIONS_ABC
 
-print "------------------------------------------------------------------"
 INTERACTIONS_AB = np.zeros((a, b))
 for i in range(0, a):
     for j in range(0, b):
@@ -232,6 +231,18 @@ for i in range(0, a):
             sums += part**2
 SSABC = r*sums
 print SSABC
+
+print "------------------------------------------------------------------"
+SSY = np.sum(np.sum(np.sum(square(DATA))))
+SSO = a * b * c * r * (TOTAL_MEAN ** 2)
+SST = SSY - SSO
+SSE = SST - (SSA + SSB + SSC + SSAB + SSAC + SSBC + SSABC)
+
+print SSY
+print SSO
+print SST
+print SSE
+
 
 # # Calculate row and column sums and means.
 # ROW_SUMS = np.sum(AVERAGES, 1)
