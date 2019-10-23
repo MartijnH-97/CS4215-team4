@@ -224,6 +224,14 @@ for j in range(0, b):
 SSBC = r*a*sums
 print SSBC
 
+sums = 0.0
+for i in range(0, a):
+    for j in range(0, b):
+        for k in range(0, c):
+            part = AVERAGES[i][k][j] - INTERACTIONS_AB[i][j] - INTERACTIONS_AC[i][k] - INTERACTIONS_BC[j][k] + MEANS[0][i] + MEANS[1][j] + MEANS[2][k] - TOTAL_MEAN
+            sums += part**2
+SSABC = r*sums
+print SSABC
 
 # # Calculate row and column sums and means.
 # ROW_SUMS = np.sum(AVERAGES, 1)
