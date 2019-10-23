@@ -163,63 +163,75 @@ print SSA
 print SSB
 print SSC
 
-INTERACTIONS_ABC = np.zeros((a, c, b))
-
-for C in range(0, c):
-    for B in range(0, b):
-        for A in range(0, a):
-            INTERACTIONS_ABC[A][C][B] = AVERAGES[A][C][B] - MEANS[0][A] - MEANS[1][B] - MEANS[2][C] + TOTAL_MEAN
-
-print INTERACTIONS_ABC
-
-INTERACTIONS_AB = np.zeros((a, b))
+# Calculate means of different combinations
+MEANS_AB = np.zeros((a, b))
 for i in range(0, a):
     for j in range(0, b):
         sum = 0.0
         for k in range(0, c):
             sum += AVERAGES[i][k][j]
 
-        INTERACTIONS_AB[i][j] = sum/c
+        MEANS_AB[i][j] = sum / c
 
-INTERACTIONS_AC = np.zeros((a, c))
+MEANS_AC = np.zeros((a, c))
 for i in range(0, a):
     for k in range(0, c):
         sum = 0.0
         for j in range(0, b):
             sum += AVERAGES[i][k][j]
 
-        INTERACTIONS_AC[i][k] = sum/b
+        MEANS_AC[i][k] = sum / b
 
-INTERACTIONS_BC = np.zeros((b, c))
+MEANS_BC = np.zeros((b, c))
 for j in range(0, b):
     for k in range(0, c):
         sum = 0.0
         for i in range(0, a):
             sum += AVERAGES[i][k][j]
 
-        INTERACTIONS_BC[j][k] = sum/a
+        MEANS_BC[j][k] = sum / a
 
+# Calculate the 2-way interactions
+INTERACTIONS_AB = np.zeros((a, b))
+for i in range(0, a):
+    for j in range(0, b):
+        INTERACTIONS_AB[i][j] = MEANS_AB[i][j] - MEANS[0][i] - MEANS[1][j] + TOTAL_MEAN
+
+INTERACTIONS_AC = np.zeros((a, c))
+for i in range(0, a):
+    for k in range(0, c):
+        INTERACTIONS_AC[i][k] = MEANS_AC[i][k] - MEANS[0][i] - MEANS[2][k] + TOTAL_MEAN
+
+INTERACTIONS_BC = np.zeros((b, c))
+for j in range(0, b):
+    for k in range(0, c):
+        INTERACTIONS_BC[j][k] = MEANS_BC[j][k] - MEANS[1][j] - MEANS[2][k] + TOTAL_MEAN
+
+INTERACTIONS_ABC = np.zeros((a, c, b))
+for k in range(0, c):
+    for j in range(0, b):
+        for i in range(0, a):
+            INTERACTIONS_ABC[i][k][j] = AVERAGES[i][k][j] - MEANS_AB[i][j] - MEANS_AC[i][k] - MEANS_BC[j][k] + MEANS[0][i] + MEANS[1][j] + MEANS[2][k] - TOTAL_MEAN
+
+# Calculate Sum of Squares for 2-way interactions
 sums = 0.0
 for i in range(0, a):
     for j in range(0, b):
-        part = INTERACTIONS_AB[i][j] - MEANS[0][i] - MEANS[1][j] + TOTAL_MEAN
-        sums += part**2
+        sums += INTERACTIONS_AB[i][j]**2
 SSAB = r*c*sums
 print SSAB
 
 sums = 0.0
 for i in range(0, a):
     for k in range(0, c):
-        part = INTERACTIONS_AC[i][k] - MEANS[0][i] - MEANS[2][k] + TOTAL_MEAN
-        sums += part**2
+        sums += INTERACTIONS_AC[i][k]**2
 SSAC = r*b*sums
 print SSAC
 
 sums = 0.0
 for j in range(0, b):
     for k in range(0, c):
-        part = INTERACTIONS_BC[j][k] - MEANS[1][j] - MEANS[2][k] + TOTAL_MEAN
-        sums += part**2
+        sums += INTERACTIONS_BC[j][k]**2
 SSBC = r*a*sums
 print SSBC
 
@@ -227,8 +239,7 @@ sums = 0.0
 for i in range(0, a):
     for j in range(0, b):
         for k in range(0, c):
-            part = AVERAGES[i][k][j] - INTERACTIONS_AB[i][j] - INTERACTIONS_AC[i][k] - INTERACTIONS_BC[j][k] + MEANS[0][i] + MEANS[1][j] + MEANS[2][k] - TOTAL_MEAN
-            sums += part**2
+            sums += INTERACTIONS_ABC[i][k][j]**2
 SSABC = r*sums
 print SSABC
 
