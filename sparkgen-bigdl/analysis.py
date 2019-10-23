@@ -151,18 +151,6 @@ print MEANS
 TOTAL_SUM = np.sum(AVERAGES)
 TOTAL_MEAN = np.average(AVERAGES)
 
-EFFECTS = MEANS - TOTAL_MEAN
-
-print TOTAL_MEAN
-print EFFECTS
-
-SSA = c*b*r*np.sum(square(EFFECTS[0]))
-SSB = c*a*r*np.sum(square(EFFECTS[1]))
-SSC = a*b*r*np.sum(square(EFFECTS[2]))
-print SSA
-print SSB
-print SSC
-
 # Calculate means of different combinations
 MEANS_AB = np.zeros((a, b))
 for i in range(0, a):
@@ -191,6 +179,9 @@ for j in range(0, b):
 
         MEANS_BC[j][k] = sum / a
 
+# Calculate main effects
+EFFECTS = MEANS - TOTAL_MEAN
+
 # Calculate the 2-way interactions
 INTERACTIONS_AB = np.zeros((a, b))
 for i in range(0, a):
@@ -213,46 +204,48 @@ for k in range(0, c):
         for i in range(0, a):
             INTERACTIONS_ABC[i][k][j] = AVERAGES[i][k][j] - MEANS_AB[i][j] - MEANS_AC[i][k] - MEANS_BC[j][k] + MEANS[0][i] + MEANS[1][j] + MEANS[2][k] - TOTAL_MEAN
 
+# Create store for SS values
+SS = np.zeros((8, 1))
+# Calculate Sum of Squares for A, B and C
+SS[0] = c*b*r*np.sum(square(EFFECTS[0]))
+SS[1] = c*a*r*np.sum(square(EFFECTS[1]))
+SS[2] = a*b*r*np.sum(square(EFFECTS[2]))
+
 # Calculate Sum of Squares for 2-way interactions
 sums = 0.0
 for i in range(0, a):
     for j in range(0, b):
         sums += INTERACTIONS_AB[i][j]**2
-SSAB = r*c*sums
-print SSAB
+SS[3] = r*c*sums
 
 sums = 0.0
 for i in range(0, a):
     for k in range(0, c):
         sums += INTERACTIONS_AC[i][k]**2
-SSAC = r*b*sums
-print SSAC
+SS[4] = r*b*sums
 
 sums = 0.0
 for j in range(0, b):
     for k in range(0, c):
         sums += INTERACTIONS_BC[j][k]**2
-SSBC = r*a*sums
-print SSBC
+SS[5] = r*a*sums
 
 sums = 0.0
 for i in range(0, a):
     for j in range(0, b):
         for k in range(0, c):
             sums += INTERACTIONS_ABC[i][k][j]**2
-SSABC = r*sums
-print SSABC
+SS[6] = r*sums
 
 print "------------------------------------------------------------------"
 SSY = np.sum(np.sum(np.sum(square(DATA))))
 SSO = a * b * c * r * (TOTAL_MEAN ** 2)
 SST = SSY - SSO
-SSE = SST - (SSA + SSB + SSC + SSAB + SSAC + SSBC + SSABC)
+SS[7] = SST - np.sum(SS)
 
 print SSY
 print SSO
 print SST
-print SSE
 
 # Store degrees for freedom
 dof = np.zeros((8, 1))
@@ -265,7 +258,33 @@ dof[5] = dof[1]*dof[2]          # BC
 dof[6] = dof[0]*dof[1]*dof[2]   # ABC
 dof[7] = a*b*c*(r - 1)          # Error
 
-print dof
+print SS
+
+# Store MS values
+MS = np.zeros((8, 1))
+
+MS[0] = SS[0]/dof[0]
+MS[1] = SS[1]/dof[1]
+MS[2] = SS[2]/dof[2]
+MS[3] = SS[3]/dof[3]
+MS[4] = SS[4]/dof[4]
+MS[5] = SS[5]/dof[5]
+MS[6] = SS[6]/dof[6]
+MS[7] = SS[7]/dof[7]
+
+print MS
+
+# Calculate F-comp values
+Fcomp = np.zeros((7, 1))
+Fcomp[0] = MS[0]/MS[7]
+Fcomp[1] = MS[1]/MS[7]
+Fcomp[2] = MS[2]/MS[7]
+Fcomp[3] = MS[3]/MS[7]
+Fcomp[4] = MS[4]/MS[7]
+Fcomp[5] = MS[5]/MS[7]
+Fcomp[6] = MS[6]/MS[7]
+
+print Fcomp
 
 
 
