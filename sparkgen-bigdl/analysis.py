@@ -254,6 +254,21 @@ print SSO
 print SST
 print SSE
 
+# Store degrees for freedom
+dof = np.zeros((8, 1))
+dof[0] = a - 1                  # A
+dof[1] = b - 1                  # B
+dof[2] = c - 1                  # C
+dof[3] = dof[0]*dof[1]          # AB
+dof[4] = dof[0]*dof[2]          # AC
+dof[5] = dof[1]*dof[2]          # BC
+dof[6] = dof[0]*dof[1]*dof[2]   # ABC
+dof[7] = a*b*c*(r - 1)          # Error
+
+print dof
+
+
+
 
 # # Calculate row and column sums and means.
 # ROW_SUMS = np.sum(AVERAGES, 1)
