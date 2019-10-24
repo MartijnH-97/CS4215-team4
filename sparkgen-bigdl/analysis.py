@@ -1,134 +1,25 @@
 import numpy as np
 from scipy.stats import f, t
 import math
-
 from LaTeXPrinter import create_table
 from dataCollector import collector
-from numpy import genfromtxt
 
-
-raw_data = genfromtxt('data/24-10-2019_1324.csv', delimiter=',')
-titles, names, parameters, DATA = collector(raw_data)
-
-DATA = DATA[:][:10][:]
-print DATA
 
 def square(x): return x ** 2
 
 
+titles, names, parameters, DATA = collector()
 
-# Here for printing LaTeX tables later on, please ignore for now
-# a_title = "Degree of Phobia"
-# b_title = "Type of Therapy"
-# c_title = "Gender"
-# a_names = ["Mild", "Moderate", "Severe"]
-# b_names = ["Desensitization", "Implosion", "Insight"]
-# c_names = ["male", "female"]
+a, b, c, r = parameters
 
-
-# Layout:
-#     /
-#   a/
-#   /_______
-#   |   b
-#  c|
-#   |
-#
-# Input definition
-# a = 3
-# b = 3
-# c = 2
-# r = 3
-# DATA = np.array(
-#     [
-#         [
-#             (10, 12, 10),
-#             (12, 9, 11),
-#             (13, 10, 9),
-#             (16, 11, 12),
-#             (14, 13, 11),
-#             (17, 15, 13)
-#         ],
-#         [
-#             (15, 12, 6),
-#             (12, 10, 7),
-#             (14, 11, 5),
-#             (17, 14, 10),
-#             (18, 13, 9),
-#             (16, 12, 11)
-#         ],
-#         [
-#             (13, 11, 10),
-#             (9, 7, 6),
-#             (11, 8, 8),
-#             (16, 10, 11),
-#             (12, 12, 10),
-#             (14, 14, 9)
-#         ]
-#     ]
-# )
-
-#Sample data for 2^k analysis, taken from the slides of lecture 1_2 slide 31.
-# a = 2
-# b = 2
-# c = 2
-# r = 3 # number of repetitions
-# DATA = np.array(
-#     [
-#         [
-#             (86, 58),
-#             (80, 62),
-#             (74, 60),
-#             (34, 22),
-#             (30, 18),
-#             (35, 20)
-#         ],
-#         [
-#             (50, 46),
-#             (55, 42),
-#             (54, 44),
-#             (11, 14),
-#             (15, 16),
-#             (19, 12)
-#         ]
-#     ]
-# )
-
-# a = 2
-# b = 2
-# c = 2
-# r = 3 # number of repetitions
-# DATA = np.array(
-#     [
-#         [
-#             (24.1, 17.6),
-#             (29.2, 18.8),
-#             (24.6, 23.2),
-#             (20.0, 14.8),
-#             (21.9, 10.3),
-#             (17.6, 11.3)
-#         ],
-#         [
-#             (14.6, 14.9),
-#             (15.3, 20.4),
-#             (12.3, 12.8),
-#             (16.1, 10.1),
-#             (9.3, 14.4),
-#             (10.8, 6.1)
-#         ]
-#     ]
-# )
-
-# # Calculate averages
+# Calculate averages
 AVERAGES = np.zeros((a, c, b))
 
 for i in range(0, a):
-    for k in range(0, b):
-        for j in range(0, c):
-            average = np.average(DATA[i][j*r : (j+1)*r], axis=0)
-            AVERAGES[i][j] = average
-
-# print AVERAGES
+    for j in range(0, b):
+        for k in range(0, c):
+            average = np.average(DATA[i][k*r : (k+1)*r], axis=0)
+            AVERAGES[i][k] = average
 
 SUMS = [[], [], []]
 MEANS = [[], [], []]
@@ -190,7 +81,7 @@ for j in range(0, b):
         MEANS_BC[j][k] = sum / a
 
 # Calculate main effects
-EFFECTS = MEANS - TOTAL_MEAN
+EFFECTS = map(lambda x: x - TOTAL_MEAN, MEANS)
 
 # Calculate the 2-way interactions
 INTERACTIONS_AB = np.zeros((a, b))
