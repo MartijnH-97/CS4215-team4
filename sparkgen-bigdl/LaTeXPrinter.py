@@ -1,6 +1,7 @@
 import numpy as np
 
-def createTable(array, row_lables, column_labels, title, label):
+
+def create_table(array, row_lables, column_labels, title, label):
     output = ""
     output += "\\begin{table}[H]\n"
     output += "\\caption{" + title + "} \\label{table:" + label + "}\n"
