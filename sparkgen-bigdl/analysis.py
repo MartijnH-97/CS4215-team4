@@ -1,124 +1,25 @@
 import numpy as np
+from scipy.stats import f, t
 import math
-import matplotlib.pyplot as plt
-
-from LaTeXPrinter import createTable
+from LaTeXPrinter import create_table
+from dataCollector import collector
 
 
 def square(x): return x ** 2
 
-# Here for printing LaTeX tables later on, please ignore for now
-a_title = "Degree of Phobia"
-b_title = "Type of Therapy"
-c_title = "Gender"
-a_names = ["Mild", "Moderate", "Severe"]
-b_names = ["Desensitization", "Implosion", "Insight"]
-c_names = ["male", "female"]
 
+titles, names, parameters, DATA = collector()
 
-# Layout:
-#     /
-#   a/
-#   /_______
-#   |   b
-#  c|
-#   |
-#
-# Input definition
-# a = 3
-# b = 3
-# c = 2
-# r = 3
-# DATA = np.array(
-#     [
-#         [
-#             (10, 12, 10),
-#             (12, 9, 11),
-#             (13, 10, 9),
-#             (16, 11, 12),
-#             (14, 13, 11),
-#             (17, 15, 13)
-#         ],
-#         [
-#             (15, 12, 6),
-#             (12, 10, 7),
-#             (14, 11, 5),
-#             (17, 14, 10),
-#             (18, 13, 9),
-#             (16, 12, 11)
-#         ],
-#         [
-#             (13, 11, 10),
-#             (9, 7, 6),
-#             (11, 8, 8),
-#             (16, 10, 11),
-#             (12, 12, 10),
-#             (14, 14, 9)
-#         ]
-#     ]
-# )
+a, b, c, r = parameters
 
-#Sample data for 2^k analysis, taken from the slides of lecture 1_2 slide 31.
-# a = 2
-# b = 2
-# c = 2
-# r = 3 # number of repetitions
-# DATA = np.array(
-#     [
-#         [
-#             (86, 58),
-#             (80, 62),
-#             (74, 60),
-#             (34, 22),
-#             (30, 18),
-#             (35, 20)
-#         ],
-#         [
-#             (50, 46),
-#             (55, 42),
-#             (54, 44),
-#             (11, 14),
-#             (15, 16),
-#             (19, 12)
-#         ]
-#     ]
-# )
-
-a = 2
-b = 2
-c = 2
-r = 3 # number of repetitions
-DATA = np.array(
-    [
-        [
-            (24.1, 17.6),
-            (29.2, 18.8),
-            (24.6, 23.2),
-            (20.0, 14.8),
-            (21.9, 10.3),
-            (17.6, 11.3)
-        ],
-        [
-            (14.6, 14.9),
-            (15.3, 20.4),
-            (12.3, 12.8),
-            (16.1, 10.1),
-            (9.3, 14.4),
-            (10.8, 6.1)
-        ]
-    ]
-)
-
-# # Calculate averages
+# Calculate averages
 AVERAGES = np.zeros((a, c, b))
 
 for i in range(0, a):
-    for k in range(0, b):
-        for j in range(0, c):
-            average = np.average(DATA[i][j*r : (j+1)*r], axis=0)
-            AVERAGES[i][j] = average
-
-print AVERAGES
+    for j in range(0, b):
+        for k in range(0, c):
+            average = np.average(DATA[i][k*r : (k+1)*r], axis=0)
+            AVERAGES[i][k] = average
 
 SUMS = [[], [], []]
 MEANS = [[], [], []]
@@ -144,8 +45,8 @@ for level in range(0, c):
     SUMS[2].append(partialSum)
     MEANS[2].append(partialSum/(a*b))
 
-print SUMS
-print MEANS
+# print SUMS
+# print MEANS
 
 # # Calculate total sum and mean
 TOTAL_SUM = np.sum(AVERAGES)
@@ -180,7 +81,7 @@ for j in range(0, b):
         MEANS_BC[j][k] = sum / a
 
 # Calculate main effects
-EFFECTS = MEANS - TOTAL_MEAN
+EFFECTS = map(lambda x: x - TOTAL_MEAN, MEANS)
 
 # Calculate the 2-way interactions
 INTERACTIONS_AB = np.zeros((a, b))
@@ -237,17 +138,31 @@ for i in range(0, a):
             sums += INTERACTIONS_ABC[i][k][j]**2
 SS[6] = r*sums
 
-print "------------------------------------------------------------------"
+# print "------------------------------------------------------------------"
 SSY = np.sum(np.sum(np.sum(square(DATA))))
 SSO = a * b * c * r * (TOTAL_MEAN ** 2)
 SST = SSY - SSO
 SS[7] = SST - np.sum(SS)
 
-print SSY
-print SSO
-print SST
+# print SSY
+# print SSO
+# print SST
 
-# Store degrees for freedom
+# Store percentage of variation explained
+percentage_variation_exp = np.zeros((8, 1))
+percentage_variation_exp[0] = SS[0]/SST                 # A
+percentage_variation_exp[1] = SS[1]/SST                 # B
+percentage_variation_exp[2] = SS[2]/SST                 # C
+percentage_variation_exp[3] = SS[3]/SST                 # AB
+percentage_variation_exp[4] = SS[4]/SST                 # AC
+percentage_variation_exp[5] = SS[5]/SST                 # BC
+percentage_variation_exp[6] = SS[6]/SST                 # ABC
+percentage_variation_exp[7] = SS[7]/SST                 # Error
+
+# Transform from fractions to percents
+percentage_variation_exp = percentage_variation_exp*100
+
+# Store degrees of freedom
 dof = np.zeros((8, 1))
 dof[0] = a - 1                  # A
 dof[1] = b - 1                  # B
@@ -258,7 +173,7 @@ dof[5] = dof[1]*dof[2]          # BC
 dof[6] = dof[0]*dof[1]*dof[2]   # ABC
 dof[7] = a*b*c*(r - 1)          # Error
 
-print SS
+# print SS
 
 # Store MS values
 MS = np.zeros((8, 1))
@@ -272,7 +187,7 @@ MS[5] = SS[5]/dof[5]
 MS[6] = SS[6]/dof[6]
 MS[7] = SS[7]/dof[7]
 
-print MS
+# print MS
 
 # Calculate F-comp values
 Fcomp = np.zeros((7, 1))
@@ -284,10 +199,114 @@ Fcomp[4] = MS[4]/MS[7]
 Fcomp[5] = MS[5]/MS[7]
 Fcomp[6] = MS[6]/MS[7]
 
-print Fcomp
+# print Fcomp
+
+alpha = 0.10
+# Calculate F-table values
+Ftab = np.zeros((7, 1))
+Ftab[0] = f.ppf(1 - alpha, dof[0], dof[7], loc=0, scale=1)
+Ftab[1] = f.ppf(1 - alpha, dof[1], dof[7], loc=0, scale=1)
+Ftab[2] = f.ppf(1 - alpha, dof[2], dof[7], loc=0, scale=1)
+Ftab[3] = f.ppf(1 - alpha, dof[3], dof[7], loc=0, scale=1)
+Ftab[4] = f.ppf(1 - alpha, dof[4], dof[7], loc=0, scale=1)
+Ftab[5] = f.ppf(1 - alpha, dof[5], dof[7], loc=0, scale=1)
+Ftab[6] = f.ppf(1 - alpha, dof[6], dof[7], loc=0, scale=1)
+#
+# print Ftab
+
+s_e = math.sqrt(MS[7])
+
+standardDeviations = []
+
+standardDevA = []
+for i in range(0, a):
+    standardDevA.append(s_e*math.sqrt(dof[0]/(a*b*c*r)))
+standardDeviations.append(standardDevA)
+
+standardDevB = []
+for j in range(0, b):
+    standardDevB.append(s_e*math.sqrt(dof[1]/(a*b*c*r)))
+standardDeviations.append(standardDevB)
+
+standardDevC = []
+for k in range(0, c):
+    standardDevC.append(s_e*math.sqrt(dof[2]/(a*b*c*r)))
+standardDeviations.append(standardDevC)
 
 
+# print standardDeviations
 
+CIs_MAIN = []
+
+CI_A = []
+for i in range(0, a):
+    high = EFFECTS[0][i] + t.ppf(1 - alpha, dof[7])*standardDeviations[0][i]
+    low = EFFECTS[0][i] - t.ppf(1 - alpha, dof[7])*standardDeviations[0][i]
+    CI_A.append((low, high))
+CIs_MAIN.append(CI_A)
+
+CI_B = []
+for j in range(0, b):
+    high = EFFECTS[1][j] + t.ppf(1 - alpha, dof[7])*standardDeviations[1][j]
+    low = EFFECTS[1][j] - t.ppf(1 - alpha, dof[7])*standardDeviations[1][j]
+    CI_B.append((low, high))
+CIs_MAIN.append(CI_B)
+
+CI_C = []
+for k in range(0, c):
+    high = EFFECTS[2][k] + t.ppf(1 - alpha, dof[7])*standardDeviations[2][k]
+    low = EFFECTS[2][k] - t.ppf(1 - alpha, dof[7])*standardDeviations[2][k]
+    CI_C.append((low, high))
+CIs_MAIN.append(CI_C)
+
+# print CIs_MAIN
+
+# OUTPUT GENERATION STARTS HERE
+
+# #  Create LaTeX table of the ANOVA results.
+RESULTS = np.zeros((11, 6))
+
+# Set sum of squares field
+RESULTS[0:3, 0] = [SSY, SSO, SST]
+RESULTS[3:, 0] = SS[:, 0]
+
+# Set Percentage of variation field
+RESULTS[2, 1] = 100
+RESULTS[3:, 1] = percentage_variation_exp[:, 0]
+
+# Set Degree of Freedom field
+RESULTS[3:, 2] = dof[:, 0]
+
+# Set Mean Square field
+RESULTS[3:, 3] = MS[:, 0]
+
+# Set F-Comp field
+RESULTS[3:-1, 4] = Fcomp[:, 0]
+
+# Set F-Table field
+RESULTS[3:-1, 5] = Ftab[:, 0]
+
+
+table_row_names = [
+                    "$y$",
+                    "$\\bar{y}...$",
+                    "$y - \\bar{y}...$"] + \
+                    [titles[0]] + \
+                    [titles[1]] + \
+                    [titles[2]] + \
+                    [titles[0] + " x "+ titles[1]] + \
+                    [titles[0] + " x "+ titles[2]] + \
+                    [titles[1] + " x "+ titles[1]] + \
+                    [titles[0] + " x "+ titles[1] + " x " + titles[2]] + \
+                    ["error"]
+table_col_names = ["Component", "Sum of squares", "\\% Variation", "DF", "Mean Square", "F-Comp.", "F-Table"]
+
+title = "ANOVA results"
+label = "anova"
+create_table(RESULTS, table_row_names,  table_col_names, title, label)
+
+
+#389
 
 # # Calculate row and column sums and means.
 # ROW_SUMS = np.sum(AVERAGES, 1)
