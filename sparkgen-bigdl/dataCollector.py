@@ -19,12 +19,12 @@ def collector():
     #   |
     #
 
-    a_title = "Maximum number of epochs"
-    b_title = "Arrival rate"
+    a_title = "Arrival rate"
+    b_title = "Maximum number of epochs"
     c_title = "Number of executors"
 
     # Read the data and discard the column names
-    raw_data = genfromtxt('data/24-10-2019_1324.csv', delimiter=',')
+    raw_data = genfromtxt('data/25-10-2019_1109.csv', delimiter=',')
     raw_data = raw_data[1:]
     # print raw_data
 
@@ -50,12 +50,12 @@ def collector():
     # print indices_B
     # print indices_C
 
-    data_index = 4
+    # data_index = 4
 
     a = len(levels_A)
     b = len(levels_B)
     c = len(levels_C)
-    r = 5 # number of repetitions
+    r = 3 # number of repetitions
     DATA = np.zeros((a, c*r, b))
 
     for item in raw_data:
@@ -63,7 +63,7 @@ def collector():
         item_B = item[1]
         item_C = item[2]
         item_R = item[3] - 1 # Mismatch between 0 and 1 indexed data.
-        result = item[data_index]
+        result = item[6] - item[5]
 
         index_A = indices_A[item_A]
         index_B = indices_B[item_B]
