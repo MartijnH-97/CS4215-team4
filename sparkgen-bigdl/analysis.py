@@ -300,7 +300,7 @@ table_row_names = [
                     [titles[2]] + \
                     [titles[0] + " x "+ titles[1]] + \
                     [titles[0] + " x "+ titles[2]] + \
-                    [titles[1] + " x "+ titles[1]] + \
+                    [titles[1] + " x "+ titles[2]] + \
                     [titles[0] + " x "+ titles[1] + " x " + titles[2]] + \
                     ["error"]
 table_col_names = ["Component", "Sum of squares", "\\% Variation", "DF", "Mean Square", "F-Comp.", "F-Table"]
@@ -327,8 +327,8 @@ table_row_names = [
 ]
 table_col_names = ["Factors", titles[1] + " = " + str(names[1][0]), titles[1] + " = " + str(names[1][1])]
 
-title = "ANOVA results"
-label = "anova"
+title = "Averages over the repetitions of the collected data"
+label = "averages"
 create_table(average_table_data, table_row_names, table_col_names, title, label)
 
 all_data_table_data = np.zeros((a * c * r + a, b))
@@ -354,8 +354,8 @@ table_row_names = [
 
 table_col_names = ["Factors", titles[1] + " = " + str(names[1][0]), titles[1] + " = " + str(names[1][1])]
 
-title = "ANOVA results"
-label = "anova"
+title = "Data collected during the study"
+label = "rawdata"
 create_table(all_data_table_data, table_row_names, table_col_names, title, label)
 
 
