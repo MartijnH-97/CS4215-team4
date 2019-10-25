@@ -305,6 +305,27 @@ title = "ANOVA results"
 label = "anova"
 create_table(RESULTS, table_row_names,  table_col_names, title, label)
 
+DATA_TABLE = np.zeros((a*c + a, b))
+DATA_TABLE[1, :] = AVERAGES[0, 0, :]
+DATA_TABLE[2, :] = AVERAGES[0, 1, :]
+DATA_TABLE[4, :] = AVERAGES[1, 0, :]
+DATA_TABLE[5, :] = AVERAGES[1, 1, :]
+
+# print DATA_TABLE
+
+table_row_names = [
+                        titles[0] + " = " + str(names[0][0]),
+                        titles[2] + " = " + str(names[2][0]),
+                        titles[2] + " = " + str(names[2][1]),
+                        titles[0] + " = " + str(names[0][1]),
+                        titles[2] + " = " + str(names[2][0]),
+                        titles[2] + " = " + str(names[2][1])
+]
+table_col_names = ["Factors", titles[1] + " = " + str(names[1][0]), titles[1] + " = " + str(names[1][1])]
+
+title = "ANOVA results"
+label = "anova"
+create_table(DATA_TABLE, table_row_names,  table_col_names, title, label)
 
 #389
 

@@ -72,7 +72,7 @@ def collector():
         DATA[index_A][index_C*r + int(item_R)][index_B] = result
 
     titles = [a_title, b_title, c_title]
-    names = [levels_A, levels_B, levels_C]
+    names = [sorted(levels_A), sorted(levels_B), sorted(levels_C)]
     parameters = [a, b, c, r]
 
     if use_real_data:
