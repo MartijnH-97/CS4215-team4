@@ -3,12 +3,16 @@ from scipy.stats import f, t
 import math
 from LaTeXPrinter import create_table
 from dataCollector import collector
+import matplotlib.pyplot as plt
 
 
 def square(x): return x ** 2
 
 
 titles, names, parameters, DATA = collector()
+
+# DATA = np.log10(DATA)
+# print DATA
 
 a, b, c, r = parameters
 
@@ -305,13 +309,13 @@ title = "ANOVA results"
 label = "anova"
 create_table(RESULTS, table_row_names,  table_col_names, title, label)
 
-DATA_TABLE = np.zeros((a*c + a, b))
-DATA_TABLE[1, :] = AVERAGES[0, 0, :]
-DATA_TABLE[2, :] = AVERAGES[0, 1, :]
-DATA_TABLE[4, :] = AVERAGES[1, 0, :]
-DATA_TABLE[5, :] = AVERAGES[1, 1, :]
+average_table_data = np.zeros((a * c + a, b))
+average_table_data[1, :] = AVERAGES[0, 0, :]
+average_table_data[2, :] = AVERAGES[0, 1, :]
+average_table_data[4, :] = AVERAGES[1, 0, :]
+average_table_data[5, :] = AVERAGES[1, 1, :]
 
-# print DATA_TABLE
+# print average_table_data
 
 table_row_names = [
                         titles[0] + " = " + str(names[0][0]),
@@ -325,8 +329,76 @@ table_col_names = ["Factors", titles[1] + " = " + str(names[1][0]), titles[1] + 
 
 title = "ANOVA results"
 label = "anova"
-create_table(DATA_TABLE, table_row_names,  table_col_names, title, label)
+create_table(average_table_data, table_row_names, table_col_names, title, label)
 
+all_data_table_data = np.zeros((a * c * r + a, b))
+all_data_table_data[1: 1+a * r] = DATA[0, :]
+all_data_table_data[2 + a * r : 2 + 2*a * r] = DATA[1, :]
+
+table_row_names = [
+    titles[0] + " = " + str(names[0][0]),
+    titles[2] + " = " + str(names[2][0]),
+    "",
+    "",
+    titles[2] + " = " + str(names[2][1]),
+    "",
+    "",
+    titles[0] + " = " + str(names[0][1]),
+    titles[2] + " = " + str(names[2][0]),
+    "",
+    "",
+    titles[2] + " = " + str(names[2][1]),
+    "",
+    "",
+]
+
+table_col_names = ["Factors", titles[1] + " = " + str(names[1][0]), titles[1] + " = " + str(names[1][1])]
+
+title = "ANOVA results"
+label = "anova"
+create_table(all_data_table_data, table_row_names, table_col_names, title, label)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Create plots of fitted value against residual and fitted value against actual value.
+fitted_residuals = []
+fitted_actual = []
+for i in range(0, a):
+    for k in range(0, c):
+        block = DATA[i][k*r:(k+1)*r]
+        for block_row in block:
+            for j in range(0, b):
+                actual = block_row[j]
+                main_effects = EFFECTS[0][i] + EFFECTS[1][j] + EFFECTS[2][k]
+                second_effects = INTERACTIONS_AB[i][j] + INTERACTIONS_AC[i][k] + INTERACTIONS_BC[j][k]
+                fitted = TOTAL_MEAN + main_effects + second_effects + INTERACTIONS_ABC[i][k][j]
+                # fitted = TOTAL_MEAN + ROW_EFFECTS[row] + COL_EFFECTS[col] + INTERACTIONS[row][col]
+                residual = actual - fitted
+
+                fitted_residuals.append((fitted, residual))
+                fitted_actual.append((fitted, actual))
+
+plt.figure()
+plt.subplot(211)
+plt.scatter(*zip(*fitted_residuals))
+plt.xlabel('Predicted value')
+plt.ylabel('Residual')
+
+plt.subplot(212)
+plt.scatter(*zip(*fitted_actual))
+plt.xlabel('Predicted value')
+plt.ylabel('Actual value')
+plt.show()
 #389
 
 # # Calculate row and column sums and means.

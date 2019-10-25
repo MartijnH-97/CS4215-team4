@@ -28,10 +28,11 @@ def collector():
     raw_data = raw_data[1:]
     # print raw_data
 
-    levels_A = set(raw_data[:, 0])
-    levels_B = set(raw_data[:, 1])
-    levels_C = set(raw_data[:, 2])
+    levels_A = sorted(set(raw_data[:, 0]))
+    levels_B = sorted(set(raw_data[:, 1]))
+    levels_C = sorted(set(raw_data[:, 2]))
 
+    # print "Levels"
     # print levels_A
     # print levels_B
     # print levels_C
@@ -46,6 +47,7 @@ def collector():
     for level in levels_C:
         indices_C[level] = len(indices_C)
 
+    # print "Indices"
     # print indices_A
     # print indices_B
     # print indices_C
@@ -73,7 +75,8 @@ def collector():
 
     titles = [a_title, b_title, c_title]
     names = [sorted(levels_A), sorted(levels_B), sorted(levels_C)]
-    parameters = [a, b, c, r]
+
+    # print names
 
     if use_real_data:
         parameters = [a, b, c, r]
