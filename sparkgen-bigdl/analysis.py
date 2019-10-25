@@ -399,7 +399,39 @@ plt.scatter(*zip(*fitted_actual))
 plt.xlabel('Predicted value')
 plt.ylabel('Actual value')
 plt.show()
-#389
+
+bar_color = (0.2, 0.4, 0.6, 0.6)
+
+h = 0
+data_m = EFFECTS[h]
+data_df = np.array(dof[7])*2
+data_sd = standardDeviations[h]
+name_low = names[h][0]*1000
+name_high = names[h][1]*1000
+plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
+plt.title("Confidence intervals for " + titles[h])
+plt.show()
+
+h = 1
+data_m = EFFECTS[h]
+data_df = np.array(dof[7])*2
+data_sd = standardDeviations[h]
+name_low = names[h][0]
+name_high = names[h][1]
+plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
+plt.title("Confidence intervals for " + titles[h])
+plt.show()
+
+h = 2
+data_m = EFFECTS[h]
+data_df = np.array(dof[7])*2
+data_sd = standardDeviations[h]
+name_low = names[h][0]
+name_high = names[h][1]
+plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
+plt.title("Confidence intervals for " + titles[h])
+plt.show()
+
 
 # # Calculate row and column sums and means.
 # ROW_SUMS = np.sum(AVERAGES, 1)
