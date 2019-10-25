@@ -9,8 +9,6 @@ spark/
 
 *.log
 
-*.png
-
 *.tgz
 
 sparkgen-bigdl/test/
