@@ -388,7 +388,9 @@ for i in range(0, a):
                 fitted_residuals.append((fitted, residual))
                 fitted_actual.append((fitted, actual))
 
+title = "Residual plots"
 plt.figure()
+plt.title(title)
 plt.subplot(211)
 plt.scatter(*zip(*fitted_residuals))
 plt.xlabel('Predicted value')
@@ -398,38 +400,45 @@ plt.subplot(212)
 plt.scatter(*zip(*fitted_actual))
 plt.xlabel('Predicted value')
 plt.ylabel('Actual value')
+plt.savefig("generated/"+title+".png")
 plt.show()
 
 bar_color = (0.2, 0.4, 0.6, 0.6)
 
 h = 0
+title = "Confidence intervals for " + titles[h]
 data_m = EFFECTS[h]
 data_df = np.array(dof[7])*2
 data_sd = standardDeviations[h]
 name_low = names[h][0]*1000
 name_high = names[h][1]*1000
 plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
-plt.title("Confidence intervals for " + titles[h])
+plt.title(title)
+plt.savefig("generated/"+title+".png")
 plt.show()
 
 h = 1
+title = "Confidence intervals for " + titles[h]
 data_m = EFFECTS[h]
 data_df = np.array(dof[7])*2
 data_sd = standardDeviations[h]
 name_low = names[h][0]
 name_high = names[h][1]
 plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
-plt.title("Confidence intervals for " + titles[h])
+plt.title(title)
+plt.savefig("generated/"+title+".png")
 plt.show()
 
 h = 2
+title = "Confidence intervals for " + titles[h]
 data_m = EFFECTS[h]
 data_df = np.array(dof[7])*2
 data_sd = standardDeviations[h]
 name_low = names[h][0]
 name_high = names[h][1]
 plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
-plt.title("Confidence intervals for " + titles[h])
+plt.title(title)
+plt.savefig("generated/"+title+".png")
 plt.show()
 
 
