@@ -555,6 +555,32 @@ if create_output:
     plt.savefig("generated/"+title+".png")
     plt.show()
 
+title="Effect of interaction between " + titles[0] + ",\n " + titles[1] + " and\n " + titles[2]
+x = []
+y = []
+for i in range(0, a):
+    for j in range(0, b):
+        for k in range(0, c):
+            bar_title = str(names[0][i]) + " x \n" + str(names[1][j]) + " x\n " + str(names[2][k])
+            value = INTERACTIONS_ABC[i][j][k]
+            x.append(bar_title)
+            y.append(value)
+
+data_df = np.array(dof[7])*8
+data_sd = [STD]*8
+
+fig, ax = plt.subplots()
+width = 1 # the width of the bars
+ind = np.arange(len(y))  # the x locations for the groups
+ax.bar(ind, y, width,  yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+ax.set_xticks(ind+width/2)
+ax.set_xticklabels(x, minor=False)
+plt.title(title)
+plt.xlabel("level of " + titles[0] + "\n x level of " + titles[1] + "\n x level of " + titles[2])
+plt.ylabel('Effect of interaction with confidence interval')
+if create_output:
+    plt.savefig("generated/"+title.replace("\n","")+".png")
+    plt.show()
 
 
 # # Calculate row and column sums and means.
