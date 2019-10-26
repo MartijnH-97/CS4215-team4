@@ -5,6 +5,7 @@ from LaTeXPrinter import create_table
 from dataCollector import collector
 import matplotlib.pyplot as plt
 
+create_output = True
 
 def square(x): return x ** 2
 
@@ -265,6 +266,8 @@ CIs_MAIN.append(CI_C)
 
 # print CIs_MAIN
 
+# Due to being a 2^3 design, all standard deviations are the same.
+STD = standardDeviations[0][0]
 # OUTPUT GENERATION STARTS HERE
 
 # #  Create LaTeX table of the ANOVA results.
@@ -358,14 +361,38 @@ title = "Data collected during the study"
 label = "rawdata"
 create_table(all_data_table_data, table_row_names, table_col_names, title, label)
 
+effects_table_data = np.zeros((a + b + c + 3, 2))
+effects_table_data[1:3, 0] = EFFECTS[0]
+effects_table_data[1:3, 1] = standardDeviations[0]
+effects_table_data[4:6, 0] = EFFECTS[1]
+effects_table_data[4:6, 1] = standardDeviations[1]
+effects_table_data[7:10, 0] = EFFECTS[2]
+effects_table_data[7:10, 1] = standardDeviations[2]
 
+STD_mu = s_e*math.sqrt(1.0 / (a*b*r*c))
+CI_mu = [TOTAL_MEAN + t.ppf(1 - alpha, dof[7])*STD_mu, TOTAL_MEAN - t.ppf(1 - alpha, dof[7])*STD_mu]
 
+# Create LaTex table for the confidence intervals of the effects.
+effects_table_data = [[TOTAL_MEAN, STD_mu, "({} , {})".format(CI_mu[0][0], CI_mu[1][0])]]
 
+effects_table_data = np.append(effects_table_data, [["", "", ""]], axis=0)
+for i in range(0, len(CIs_MAIN[0])):
+    effects_table_data = np.append(effects_table_data, [[EFFECTS[0][i], standardDeviations[0][i], "({} , {})".format(CIs_MAIN[0][i][0][0], CIs_MAIN[0][i][1][0])]], axis=0)
 
+effects_table_data = np.append(effects_table_data, [["", "", ""]], axis=0)
+for j in range(0, len(CIs_MAIN[1])):
+    effects_table_data = np.append(effects_table_data, [[EFFECTS[1][j], standardDeviations[1][j], "({} , {})".format(CIs_MAIN[1][j][0][0], CIs_MAIN[1][j][1][0])]], axis=0)
 
+effects_table_data = np.append(effects_table_data, [["", "", ""]], axis=0)
+for k in range(0, len(CIs_MAIN[2])):
+    effects_table_data = np.append(effects_table_data, [[EFFECTS[2][k], standardDeviations[2][k], "({} , {})".format(CIs_MAIN[2][k][0][0], CIs_MAIN[2][k][1][0])]], axis=0)
 
+table_row_names = ["$\\mu$"] + [titles[0]] + names[0] + [titles[1]] + names[1] + [titles[2]] + names[2]
+table_col_names = ["Parameter", "Mean Effect", "Standard Deviation", "CI"]
 
-
+title = "Confidence intervals of main effects"
+label = "CI_effects"
+create_table(effects_table_data, table_row_names, table_col_names, title, label)
 
 
 
@@ -382,7 +409,6 @@ for i in range(0, a):
                 main_effects = EFFECTS[0][i] + EFFECTS[1][j] + EFFECTS[2][k]
                 second_effects = INTERACTIONS_AB[i][j] + INTERACTIONS_AC[i][k] + INTERACTIONS_BC[j][k]
                 fitted = TOTAL_MEAN + main_effects + second_effects + INTERACTIONS_ABC[i][k][j]
-                # fitted = TOTAL_MEAN + ROW_EFFECTS[row] + COL_EFFECTS[col] + INTERACTIONS[row][col]
                 residual = actual - fitted
 
                 fitted_residuals.append((fitted, residual))
@@ -400,8 +426,9 @@ plt.subplot(212)
 plt.scatter(*zip(*fitted_actual))
 plt.xlabel('Predicted value')
 plt.ylabel('Actual value')
-plt.savefig("generated/"+title+".png")
-plt.show()
+if create_output:
+    plt.savefig("generated/"+title+".png")
+    plt.show()
 
 bar_color = (0.2, 0.4, 0.6, 0.6)
 
@@ -414,8 +441,9 @@ name_low = names[h][0]*1000
 name_high = names[h][1]*1000
 plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
 plt.title(title)
-plt.savefig("generated/"+title+".png")
-plt.show()
+if create_output:
+    plt.savefig("generated/"+title+".png")
+    plt.show()
 
 h = 1
 title = "Confidence intervals for " + titles[h]
@@ -426,8 +454,9 @@ name_low = names[h][0]
 name_high = names[h][1]
 plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
 plt.title(title)
-plt.savefig("generated/"+title+".png")
-plt.show()
+if create_output:
+    plt.savefig("generated/"+title+".png")
+    plt.show()
 
 h = 2
 title = "Confidence intervals for " + titles[h]
@@ -438,8 +467,94 @@ name_low = names[h][0]
 name_high = names[h][1]
 plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color)
 plt.title(title)
-plt.savefig("generated/"+title+".png")
-plt.show()
+if create_output:
+    plt.savefig("generated/"+title+".png")
+    plt.show()
+
+g = 0
+h = 1
+title = "Effect of interaction between " + titles[g] + " and " + titles[h]
+x = []
+y = []
+for i in range(0, a):
+    for j in range(0, b):
+        bar_title = str(names[g][i]) + " x " + str(names[h][j])
+        value = INTERACTIONS_AB[i][j]
+        x.append(bar_title)
+        y.append(value)
+
+data_df = np.array(dof[7])*4
+data_sd = [STD]*4
+
+fig, ax = plt.subplots()
+width = 1 # the width of the bars
+ind = np.arange(len(y))  # the x locations for the groups
+ax.bar(ind, y, width,  yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+ax.set_xticks(ind+width/2)
+ax.set_xticklabels(x, minor=False)
+plt.title(title)
+plt.xlabel("level of " + titles[g] + " x level of " + titles[h])
+plt.ylabel('Effect of interaction with confidence interval')
+if create_output:
+    plt.savefig("generated/"+title+".png")
+    plt.show()
+
+g = 0
+h = 2
+title = "Effect of interaction between " + titles[g] + " and " + titles[h]
+x = []
+y = []
+for i in range(0, a):
+    for k in range(0, c):
+        bar_title = str(names[g][i]) + " x " + str(names[h][k])
+        value = INTERACTIONS_AC[i][k]
+        x.append(bar_title)
+        y.append(value)
+
+data_df = np.array(dof[7])*4
+data_sd = [STD]*4
+
+fig, ax = plt.subplots()
+width = 1 # the width of the bars
+ind = np.arange(len(y))  # the x locations for the groups
+ax.bar(ind, y, width,  yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+ax.set_xticks(ind+width/2)
+ax.set_xticklabels(x, minor=False)
+plt.title(title)
+plt.xlabel("level of " + titles[g] + " x level of " + titles[h])
+plt.ylabel('Effect of interaction with confidence interval')
+if create_output:
+    plt.savefig("generated/"+title+".png")
+    plt.show()
+
+g = 1
+h = 2
+title="Effect of interaction between " + titles[g] + " and " + titles[h]
+x = []
+y = []
+for j in range(0, b):
+    for k in range(0, c):
+        bar_title = str(names[g][j]) + " x " + str(names[1][k])
+        value = INTERACTIONS_BC[j][k]
+        x.append(bar_title)
+        y.append(value)
+
+data_df = np.array(dof[7])*4
+data_sd = [STD]*4
+
+fig, ax = plt.subplots()
+width = 1 # the width of the bars
+ind = np.arange(len(y))  # the x locations for the groups
+ax.bar(ind, y, width,  yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+ax.set_xticks(ind+width/2)
+ax.set_xticklabels(x, minor=False)
+plt.title(title)
+plt.xlabel("level of " + titles[g] + " x level of " + titles[h])
+plt.ylabel('Effect of interaction with confidence interval')
+if create_output:
+    plt.savefig("generated/"+title+".png")
+    plt.show()
+
 
 
 # # Calculate row and column sums and means.
