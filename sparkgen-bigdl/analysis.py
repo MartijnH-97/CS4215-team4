@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 create_output = True
 
+
 def square(x): return x ** 2
 
 
@@ -515,8 +516,15 @@ data_df = np.array(dof[7])*2
 data_sd = standardDeviations[h]
 name_low = names[h][0]*1000
 name_high = names[h][1]*1000
-plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+fig, ax = plt.subplots()
+width = 1
+ind = np.arange(len(data_m))
+ax.bar(ind, data_m, width, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+ax.set_xticks(ind+width/2)
+ax.set_xticklabels([name_low, name_high], minor=False)
 plt.title(title)
+plt.xlabel("level of " + titles[h])
+plt.ylabel('Effect with confidence interval')
 if create_output:
     plt.savefig("generated/"+title+".png")
     plt.show()
@@ -528,8 +536,15 @@ data_df = np.array(dof[7])*2
 data_sd = standardDeviations[h]
 name_low = names[h][0]
 name_high = names[h][1]
-plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+fig, ax = plt.subplots()
+width = 1
+ind = np.arange(len(data_m))
+ax.bar(ind, data_m, width, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+ax.set_xticks(ind+width/2)
+ax.set_xticklabels([name_low, name_high], minor=False)
 plt.title(title)
+plt.xlabel("level of " + titles[h])
+plt.ylabel('Effect with confidence interval')
 if create_output:
     plt.savefig("generated/"+title+".png")
     plt.show()
@@ -541,8 +556,15 @@ data_df = np.array(dof[7])*2
 data_sd = standardDeviations[h]
 name_low = names[h][0]
 name_high = names[h][1]
-plt.bar([name_low,name_high], data_m, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+fig, ax = plt.subplots()
+width = 1
+ind = np.arange(len(data_m))
+ax.bar(ind, data_m, width, yerr=t.ppf(1-alpha, data_df)*data_sd, color=bar_color, align='center')
+ax.set_xticks(ind+width/2)
+ax.set_xticklabels([name_low, name_high], minor=False)
 plt.title(title)
+plt.xlabel("level of " + titles[h])
+plt.ylabel('Effect with confidence interval')
 if create_output:
     plt.savefig("generated/"+title+".png")
     plt.show()
