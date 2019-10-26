@@ -534,7 +534,7 @@ x = []
 y = []
 for j in range(0, b):
     for k in range(0, c):
-        bar_title = str(names[g][j]) + " x " + str(names[1][k])
+        bar_title = str(names[g][j]) + " x " + str(names[h][k])
         value = INTERACTIONS_BC[j][k]
         x.append(bar_title)
         y.append(value)
