@@ -18,7 +18,7 @@ def create_table(array, row_lables, column_labels, title, label):
     output += "\\\\ \\hline \n"
 
     for row in range(0, len(array)):
-        output += row_lables[row]
+        output += str(row_lables[row])
         for col in range(0, len(array[0])):
                 val = array[row][col]
                 if isinstance(val, list) or isinstance(val, np.ndarray):

@@ -361,14 +361,6 @@ title = "Data collected during the study"
 label = "rawdata"
 create_table(all_data_table_data, table_row_names, table_col_names, title, label)
 
-effects_table_data = np.zeros((a + b + c + 3, 2))
-effects_table_data[1:3, 0] = EFFECTS[0]
-effects_table_data[1:3, 1] = standardDeviations[0]
-effects_table_data[4:6, 0] = EFFECTS[1]
-effects_table_data[4:6, 1] = standardDeviations[1]
-effects_table_data[7:10, 0] = EFFECTS[2]
-effects_table_data[7:10, 1] = standardDeviations[2]
-
 STD_mu = s_e*math.sqrt(1.0 / (a*b*r*c))
 CI_mu = [TOTAL_MEAN + t.ppf(1 - alpha, dof[7])*STD_mu, TOTAL_MEAN - t.ppf(1 - alpha, dof[7])*STD_mu]
 
@@ -394,6 +386,90 @@ title = "Confidence intervals of main effects"
 label = "CI_effects"
 create_table(effects_table_data, table_row_names, table_col_names, title, label)
 
+
+g=0
+h=1
+effectsAB_table_data = [[titles[h] + " = " + str(names[h][0]), "", "", titles[h] + " = " + str(names[h][1]), "", ""]]
+for i in range(0, a):
+    frst_effect = INTERACTIONS_AB[i][0]
+    bar = t.ppf(1 - alpha, dof[7])*STD
+
+    frst_CI = "({} ,{})".format(frst_effect + bar[0], frst_effect - bar[0])
+
+    scnd_effect = INTERACTIONS_AB[i][1]
+    scnd_CI = "({} ,{})".format(scnd_effect + bar[0], scnd_effect - bar[0])
+
+    row = [[frst_effect, STD, frst_CI, scnd_effect, STD, scnd_CI]]
+    effectsAB_table_data = np.append(effectsAB_table_data, row, axis=0)
+
+table_row_names = ["", titles[g] + " = " + str(names[g][0])] + [titles[g] + " = " + str(names[g][1])]
+table_col_names = ["Parameter",
+                   "Mean Effect interaction",
+                   "Standard Deviation",
+                   "CI",
+                   "Mean Effect interaction",
+                   "Standard Deviation",
+                   "CI"]
+
+title = "Effects and confidence intervals of interaction between " + titles[g] + " and " + titles[h]
+label = "CI_effects_interactions_AB"
+create_table(effectsAB_table_data, table_row_names, table_col_names, title, label)
+
+g=0
+h=2
+effectsAC_table_data = [[titles[h] + " = " + str(names[h][0]), "", "", titles[h] + " = " + str(names[h][1]), "", ""]]
+for i in range(0, a):
+    frst_effect = INTERACTIONS_AC[i][0]
+    bar = t.ppf(1 - alpha, dof[7])*STD
+
+    frst_CI = "({} ,{})".format(frst_effect + bar[0], frst_effect - bar[0])
+
+    scnd_effect = INTERACTIONS_AC[i][1]
+    scnd_CI = "({} ,{})".format(scnd_effect + bar[0], scnd_effect - bar[0])
+
+    row = [[frst_effect, STD, frst_CI, scnd_effect, STD, scnd_CI]]
+    effectsAC_table_data = np.append(effectsAC_table_data, row, axis=0)
+
+table_row_names = ["", titles[g] + " = " + str(names[g][0])] + [titles[g] + " = " + str(names[g][1])]
+table_col_names = ["Parameter",
+                   "Mean Effect interaction",
+                   "Standard Deviation",
+                   "CI",
+                   "Mean Effect interaction",
+                   "Standard Deviation",
+                   "CI"]
+
+title = "Effects and confidence intervals of interaction between " + titles[g] + " and " + titles[h]
+label = "CI_effects_interactions_AC"
+create_table(effectsAC_table_data, table_row_names, table_col_names, title, label)
+
+g=1
+h=2
+effectsAB_table_data = [[titles[h] + " = " + str(names[h][0]), "", "", titles[h] + " = " + str(names[h][1]), "", ""]]
+for i in range(0, a):
+    frst_effect = INTERACTIONS_BC[i][0]
+    bar = t.ppf(1 - alpha, dof[7])*STD
+
+    frst_CI = "({} ,{})".format(frst_effect + bar[0], frst_effect - bar[0])
+
+    scnd_effect = INTERACTIONS_BC[i][1]
+    scnd_CI = "({} ,{})".format(scnd_effect + bar[0], scnd_effect - bar[0])
+
+    row = [[frst_effect, STD, frst_CI, scnd_effect, STD, scnd_CI]]
+    effectsAB_table_data = np.append(effectsAB_table_data, row, axis=0)
+
+table_row_names = ["", titles[g] + " = " + str(names[g][0])] + [titles[g] + " = " + str(names[g][1])]
+table_col_names = ["Parameter",
+                   "Mean Effect interaction",
+                   "Standard Deviation",
+                   "CI",
+                   "Mean Effect interaction",
+                   "Standard Deviation",
+                   "CI"]
+
+title = "Effects and confidence intervals of interaction between " + titles[g] + " and " + titles[h]
+label = "CI_effects_interactions_BC"
+create_table(effectsAB_table_data, table_row_names, table_col_names, title, label)
 
 
 
