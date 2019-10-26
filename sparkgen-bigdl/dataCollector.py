@@ -24,7 +24,7 @@ def collector():
     c_title = "Number of executors"
 
     # Read the data and discard the column names
-    raw_data = genfromtxt('data/25-10-2019_1109.csv', delimiter=',')
+    raw_data = genfromtxt('data/26-10-2019_0817.csv', delimiter=',')
     raw_data = raw_data[1:]
     # print raw_data
 
