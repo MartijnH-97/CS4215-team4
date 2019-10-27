@@ -364,7 +364,7 @@ func cmd(master string,
 	fmt.Fprintf(&buffer, "--action %s ", action)
 	fmt.Fprintf(&buffer, "--dataPath %s ", dataPath)
 	fmt.Fprintf(&buffer, "--batchSize %d ", batchSizeInt - overflow)
-	fmt.Fprintf(&buffer, "--endTriggerNum %s ", maxEpoch)
+	fmt.Fprintf(&buffer, "--endTriggerNum %d ", numberOfEpochs)
 	fmt.Fprintf(&buffer, "--learningRate %s ", learningRate)
 	fmt.Fprintf(&buffer, "--learningrateDecay %s ", learningrateDecay)
 
