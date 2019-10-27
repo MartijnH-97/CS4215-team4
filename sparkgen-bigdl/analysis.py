@@ -5,17 +5,18 @@ from LaTeXPrinter import create_table
 from dataCollector import collector
 import matplotlib.pyplot as plt
 
+# Toggle creation of output graphs.
 create_output = True
+
+# Define confidence level to use.
+alpha = 0.10
 
 
 def square(x): return x ** 2
 
 
+# Obtain data information
 titles, names, parameters, DATA = collector()
-
-# DATA = np.log10(DATA)
-# print DATA
-
 a, b, c, r = parameters
 
 # Calculate averages
@@ -50,9 +51,6 @@ for level in range(0, c):
         partialSum += np.sum(AVERAGES[depth], 1)[level]
     SUMS[2].append(partialSum)
     MEANS[2].append(partialSum/(a*b))
-
-# print SUMS
-# print MEANS
 
 # # Calculate total sum and mean
 TOTAL_SUM = np.sum(AVERAGES)
@@ -144,15 +142,10 @@ for i in range(0, a):
             sums += INTERACTIONS_ABC[i][k][j]**2
 SS[6] = r*sums
 
-# print "------------------------------------------------------------------"
 SSY = np.sum(np.sum(np.sum(square(DATA))))
 SSO = a * b * c * r * (TOTAL_MEAN ** 2)
 SST = SSY - SSO
 SS[7] = SST - np.sum(SS)
-
-# print SSY
-# print SSO
-# print SST
 
 # Store percentage of variation explained
 percentage_variation_exp = np.zeros((8, 1))
@@ -179,8 +172,6 @@ dof[5] = dof[1]*dof[2]          # BC
 dof[6] = dof[0]*dof[1]*dof[2]   # ABC
 dof[7] = a*b*c*(r - 1)          # Error
 
-# print SS
-
 # Store MS values
 MS = np.zeros((8, 1))
 
@@ -193,8 +184,6 @@ MS[5] = SS[5]/dof[5]
 MS[6] = SS[6]/dof[6]
 MS[7] = SS[7]/dof[7]
 
-# print MS
-
 # Calculate F-comp values
 Fcomp = np.zeros((7, 1))
 Fcomp[0] = MS[0]/MS[7]
@@ -205,9 +194,6 @@ Fcomp[4] = MS[4]/MS[7]
 Fcomp[5] = MS[5]/MS[7]
 Fcomp[6] = MS[6]/MS[7]
 
-# print Fcomp
-
-alpha = 0.10
 # Calculate F-table values
 Ftab = np.zeros((7, 1))
 Ftab[0] = f.ppf(1 - alpha, dof[0], dof[7], loc=0, scale=1)
@@ -239,9 +225,7 @@ for k in range(0, c):
     standardDevC.append(s_e*math.sqrt(dof[2]/(a*b*c*r)))
 standardDeviations.append(standardDevC)
 
-
-# print standardDeviations
-
+# Confidence intervals for main effects
 CIs_MAIN = []
 
 CI_A = []
@@ -265,10 +249,9 @@ for k in range(0, c):
     CI_C.append((low, high))
 CIs_MAIN.append(CI_C)
 
-# print CIs_MAIN
-
 # Due to being a 2^3 design, all standard deviations are the same.
 STD = standardDeviations[0][0]
+
 # OUTPUT GENERATION STARTS HERE
 
 # #  Create LaTeX table of the ANOVA results.
@@ -313,13 +296,12 @@ title = "ANOVA results"
 label = "anova"
 create_table(RESULTS, table_row_names,  table_col_names, title, label)
 
+# #  Create LaTeX table of the averages used during the study.
 average_table_data = np.zeros((a * c + a, b))
 average_table_data[1, :] = AVERAGES[0, 0, :]
 average_table_data[2, :] = AVERAGES[0, 1, :]
 average_table_data[4, :] = AVERAGES[1, 0, :]
 average_table_data[5, :] = AVERAGES[1, 1, :]
-
-# print average_table_data
 
 table_row_names = [
                         titles[0] + " = " + str(names[0][0]),
@@ -335,6 +317,7 @@ title = "Averages over the repetitions of the collected data"
 label = "averages"
 create_table(average_table_data, table_row_names, table_col_names, title, label)
 
+# #  Create LaTeX table of the raw data.
 all_data_table_data = np.zeros((a * c * r + a, b))
 all_data_table_data[1: 1+a * r] = DATA[0, :]
 all_data_table_data[2 + a * r : 2 + 2*a * r] = DATA[1, :]
@@ -362,10 +345,10 @@ title = "Data collected during the study"
 label = "rawdata"
 create_table(all_data_table_data, table_row_names, table_col_names, title, label)
 
+# Create LaTex table for the confidence intervals of the main effects.
 STD_mu = s_e*math.sqrt(1.0 / (a*b*r*c))
 CI_mu = [TOTAL_MEAN + t.ppf(1 - alpha, dof[7])*STD_mu, TOTAL_MEAN - t.ppf(1 - alpha, dof[7])*STD_mu]
 
-# Create LaTex table for the confidence intervals of the effects.
 effects_table_data = [[TOTAL_MEAN, STD_mu, "({} , {})".format(CI_mu[0][0], CI_mu[1][0])]]
 
 effects_table_data = np.append(effects_table_data, [["", "", ""]], axis=0)
@@ -387,7 +370,7 @@ title = "Confidence intervals of main effects"
 label = "CI_effects"
 create_table(effects_table_data, table_row_names, table_col_names, title, label)
 
-
+# Create LaTeX table of the AB interaction.
 g=0
 h=1
 effectsAB_table_data = [[titles[h] + " = " + str(names[h][0]), "", "", titles[h] + " = " + str(names[h][1]), "", ""]]
@@ -416,6 +399,7 @@ title = "Effects and confidence intervals of interaction between " + titles[g] +
 label = "CI_effects_interactions_AB"
 create_table(effectsAB_table_data, table_row_names, table_col_names, title, label)
 
+# Create LaTeX table of the AC interaction.
 g=0
 h=2
 effectsAC_table_data = [[titles[h] + " = " + str(names[h][0]), "", "", titles[h] + " = " + str(names[h][1]), "", ""]]
@@ -444,6 +428,7 @@ title = "Effects and confidence intervals of interaction between " + titles[g] +
 label = "CI_effects_interactions_AC"
 create_table(effectsAC_table_data, table_row_names, table_col_names, title, label)
 
+# Create LaTeX table of the BC interaction.
 g=1
 h=2
 effectsAB_table_data = [[titles[h] + " = " + str(names[h][0]), "", "", titles[h] + " = " + str(names[h][1]), "", ""]]
@@ -471,8 +456,6 @@ table_col_names = ["Parameter",
 title = "Effects and confidence intervals of interaction between " + titles[g] + " and " + titles[h]
 label = "CI_effects_interactions_BC"
 create_table(effectsAB_table_data, table_row_names, table_col_names, title, label)
-
-
 
 # Create plots of fitted value against residual and fitted value against actual value.
 fitted_residuals = []
@@ -509,6 +492,7 @@ if create_output:
 
 bar_color = (0.2, 0.4, 0.6, 0.6)
 
+# Create bar graph of the main effect A
 h = 0
 title = "Effect of " + titles[h]
 data_m = EFFECTS[h]
@@ -529,6 +513,7 @@ if create_output:
     plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
+# Create bar graph of the main effect B
 h = 1
 title = "Effect of " + titles[h]
 data_m = EFFECTS[h]
@@ -549,6 +534,7 @@ if create_output:
     plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
+# Create bar graph of the main effect C
 h = 2
 title = "Effect of " + titles[h]
 data_m = EFFECTS[h]
@@ -569,6 +555,7 @@ if create_output:
     plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
+# Create bar graph of the interaction AB
 g = 0
 h = 1
 title = "Effect of interaction between \n" + titles[g] + " and " + titles[h]
@@ -597,6 +584,7 @@ if create_output:
     plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
+# Create bar graph of the interaction AC
 g = 0
 h = 2
 title = "Effect of interaction between \n" + titles[g] + " and " + titles[h]
@@ -625,6 +613,7 @@ if create_output:
     plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
+# Create bar graph of the interaction BC
 g = 1
 h = 2
 title="Effect of interaction between \n" + titles[g] + " and " + titles[h]
@@ -653,6 +642,7 @@ if create_output:
     plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
+# Create bar graph of the interaction ABC
 title="Effect of interaction between " + titles[0] + ",\n " + titles[1] + " and\n " + titles[2]
 x = []
 y = []
@@ -679,221 +669,3 @@ plt.ylabel('Effect of interaction with confidence interval')
 if create_output:
     plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
-
-
-# # Calculate row and column sums and means.
-# ROW_SUMS = np.sum(AVERAGES, 1)
-# COL_SUMS = np.sum(AVERAGES, 0)
-#
-# ROW_MEANS = ROW_SUMS / a
-# COL_MEANS = COL_SUMS / b
-#
-# # Calculate total sum and mean
-# TOTAL_SUM = sum(ROW_SUMS)
-# TOTAL_MEAN = TOTAL_SUM / (b * a)
-#
-#
-# # Calculate row and column effects
-# ROW_EFFECTS = ROW_MEANS - TOTAL_MEAN
-# COL_EFFECTS = COL_MEANS - TOTAL_MEAN
-#
-# # Calculate interactions
-# INTERACTIONS = np.zeros((b, a))
-#
-# for dataset in range(0, b):
-#     for algorithm in range(0, a):
-#         INTERACTIONS[dataset][algorithm] = AVERAGES[dataset][algorithm] - ROW_MEANS[dataset] - COL_MEANS[
-#             algorithm] + TOTAL_MEAN
-#
-# # Create LaTex table of the interactions
-# title = "Effects of the interactions"
-# label = "effects_interactions"
-# createTable(INTERACTIONS, b_names,  [b_title] + a_names, title, label)
-#
-# # Create LaTex table of the computation of effects
-# print_data = np.append(AVERAGES, ROW_SUMS.reshape((b, 1)), axis=1)
-# print_data = np.append(print_data, ROW_MEANS.reshape((b, 1)), axis=1)
-# print_data = np.append(print_data, ROW_EFFECTS.reshape((b, 1)), axis=1)
-#
-# print_data = np.append(print_data, np.append(COL_SUMS, [TOTAL_SUM, 0, 0]).reshape((1, a + 3)), axis=0)
-# print_data = np.append(print_data, np.append(COL_MEANS, [0, TOTAL_MEAN, 0]).reshape((1, a + 3)), axis=0)
-# print_data = np.append(print_data, np.append(COL_EFFECTS, [0, 0, 0]).reshape((1, a + 3)), axis=0)
-#
-# title = "Computation of effects"
-# label = "computation_effects"
-# createTable(print_data, b_names + ["Col Sum", "Col Mean", "Col Effect"],  [b_title] + a_names + ["Row Sum", "Row Mean", "Row Effect"], title, label)
-#
-# """The created ANOVA table has the following structure:
-# columns:
-# [X][0] Sum of squares,
-# [X][1] Percentage of variation explained,
-# [X][2] Degrees of freedom,
-# [X][3] Mean squares,
-# [X][4] F-comp. values,
-# [X][5] F-table values
-#
-# rows:
-# [0][X] y
-# [1][X] bar{y}...
-# [2][X] y - bar{y}...
-# [3][X] Classifiers (factor A)
-# [4][X] Datasets (factor B)
-# [5][X] Interactions
-# [6][X] Error
-# """
-# # Start computation of ANOVA results.
-# RESULTS = np.zeros((7, 6))
-#
-# # Calculate  sum of squares
-# RESULTS[0][0] = sum(sum(square(DATA)))
-# RESULTS[1][0] = a * b * r * TOTAL_MEAN ** 2
-# RESULTS[2][0] = RESULTS[0][0] - RESULTS[1][0]
-# RESULTS[3][0] = b * r * sum(square(COL_EFFECTS))
-# RESULTS[4][0] = a * r * sum(square(ROW_EFFECTS))
-# RESULTS[5][0] = r * sum(sum(square(INTERACTIONS)))
-# RESULTS[6][0] = RESULTS[2][0] - RESULTS[3][0] - RESULTS[4][0] - RESULTS[5][0]
-#
-# # Calculate amount of variation explained
-# RESULTS[2][1] = 100
-# RESULTS[3][1] = 100*(RESULTS[3][0]/RESULTS[2][0])
-# RESULTS[4][1] = 100*(RESULTS[4][0]/RESULTS[2][0])
-# RESULTS[5][1] = 100*(RESULTS[5][0]/RESULTS[2][0])
-# RESULTS[6][1] = 100*(RESULTS[6][0]/RESULTS[2][0])
-#
-# # Calculate degrees of freedom
-# RESULTS[0][2] = a*b*r
-# RESULTS[1][2] = 1
-# RESULTS[2][2] = a*b*r - 1
-# RESULTS[3][2] = a - 1
-# RESULTS[4][2] = b - 1
-# RESULTS[5][2] = (a - 1)*(b - 1)
-# RESULTS[6][2] = a*b*(r - 1)
-#
-# # Calculate mean squares
-# RESULTS[3][3] = RESULTS[3][0] / (a - 1)
-# RESULTS[4][3] = RESULTS[4][0] / (b - 1)
-# RESULTS[5][3] = RESULTS[5][0] / ((a - 1)*(b - 1))
-# RESULTS[6][3] = RESULTS[6][0] / (a*b*(r - 1))
-#
-# # Calculate F-comp values
-# RESULTS[3][4] = RESULTS[3][3] / RESULTS[6][3]
-# RESULTS[4][4] = RESULTS[4][3] / RESULTS[6][3]
-# RESULTS[5][4] = RESULTS[5][3] / RESULTS[6][3]
-#
-# # Placeholders for F-table values. Could not get automatic F-table lookup to work.
-# RESULTS[3][5] = 2.49
-# RESULTS[4][5] = 2.14
-# RESULTS[5][5] = 1.88
-#
-# #  Create LaTeX table of the ANOVA results.
-# table_row_names = ["$y$", "$\\bar{y}...$", "$y - \\bar{y}...$"] + [a_title] + [b_title] + ["Interaction"] + ["error"]
-# table_col_names = ["Component", "Sum of squares", "\\% Variation", "DF", "Mean Square", "F-Comp.", "F-Table"]
-#
-# title = "ANOVA results"
-# label = "anova"
-# createTable(RESULTS, table_row_names,  table_col_names, title, label)
-#
-# Se = math.sqrt(RESULTS[6][3])
-#
-# # Calculate standard deviations
-# STD_A = Se*math.sqrt((a - 1.0) / (a*b*r))
-# STD_B = Se*math.sqrt((b - 1.0) / (a*b*r))
-# STD_mu = Se*math.sqrt(1.0 / (a*b*r))
-#
-# # t[0.95, ab(r-1)], looked up manually as I couldn't get the automatic lookup working.
-# quantile = 1.697
-#
-# # Calculate confidence intervals
-# CI_A = np.zeros((a, 3))
-# CI_B = np.zeros((b, 3))
-#
-# CI_mu = (TOTAL_MEAN - STD_mu*quantile, TOTAL_MEAN + STD_mu*quantile)
-#
-# for i in range(0, a):
-#     CI_A[i][0] = STD_A
-#
-# for i in range(0, b):
-#     CI_B[i][0] = STD_B
-#
-# # Calculate confidence intervals for factor A
-# for i in range(0, a):
-#     minVal = COL_EFFECTS[i] - CI_A[i][0]*quantile
-#     maxVal = COL_EFFECTS[i] + CI_A[i][0]*quantile
-#     CI_A[i][1] = minVal
-#     CI_A[i][2] = maxVal
-#
-# # Calculate confidence intervals for factor B
-# for i in range(0, b):
-#     minVal = ROW_EFFECTS[i] - CI_B[i][0]*quantile
-#     maxVal = ROW_EFFECTS[i] + CI_B[i][0]*quantile
-#     CI_B[i][1] = minVal
-#     CI_B[i][2] = maxVal
-#
-# # Create LaTex table for the confidence intervals of the effects.
-# print_data = [[TOTAL_MEAN, STD_mu, "({} , {})".format(CI_mu[0], CI_mu[1])]]
-#
-# print_data = np.append(print_data, [["", "", ""]], axis=0)
-# for i in range(0, len(CI_A)):
-#     print_data = np.append(print_data, [[COL_EFFECTS[i], STD_A, "({} , {})".format(CI_A[i][1], CI_A[i][2])]], axis=0)
-#
-# print_data = np.append(print_data, [["", "", ""]], axis=0)
-# for i in range(0, len(CI_B)):
-#     print_data = np.append(print_data, [[ROW_EFFECTS[i], STD_B, "({} , {})".format(CI_B[i][1], CI_B[i][2])]], axis=0)
-#
-# table_row_names = ["$\\mu$"] + [a_title] + a_names + [b_title] + b_names
-# table_col_names = ["Parameter", "Mean Effect", "Standard Deviation", "CI"]
-#
-# title = "Confidence intervals of effects"
-# label = "CI_effects"
-# createTable(print_data, table_row_names, table_col_names, title, label)
-#
-# # Calculate confidence intervals for the interactions.
-# STD_AB = Se*math.sqrt(((a - 1.0)*(b - 1)) / (a*b*r))
-#
-# CI_AB = np.zeros((b, a), dtype=(float, 2))
-#
-# for i in range(0, a):
-#     for j in range(0, b):
-#         minVal = INTERACTIONS[j][i] - STD_AB*quantile
-#         maxVal = INTERACTIONS[j][i] + STD_AB*quantile
-#         CI_AB[j][i] = (minVal, maxVal)
-#
-# # Create LaTex table for the confidence intervals of interactions
-# table_row_names = b_names
-# table_col_names = [b_title] + a_names
-#
-# title = "Confidence intervals of interactions"
-# label = "CI_interactions_effects"
-# createTable(CI_AB, table_row_names, table_col_names, title, label)
-#
-# # Create plots of fitted value against residual and fitted value against actual value.
-# fitted_residuals = []
-# fitted_actual = []
-# for row in range(0, b):
-#     block = DATA[row*r:(row+1)*r]
-#     for block_row in block:
-#         for col in range(0, a):
-#             actual = block_row[col]
-#             fitted = TOTAL_MEAN + ROW_EFFECTS[row] + COL_EFFECTS[col] + INTERACTIONS[row][col]
-#             residual = actual - fitted
-#
-#             fitted_residuals.append((fitted, residual))
-#             fitted_actual.append((fitted, actual))
-#
-# plt.figure()
-# plt.subplot(211)
-# plt.scatter(*zip(*fitted_residuals))
-# plt.xlabel('Predicted value')
-# plt.ylabel('Residual')
-#
-# plt.subplot(212)
-# plt.scatter(*zip(*fitted_actual))
-# plt.xlabel('Predicted value')
-# plt.ylabel('Actual value')
-# plt.show()
-
-
-
-
-
-
