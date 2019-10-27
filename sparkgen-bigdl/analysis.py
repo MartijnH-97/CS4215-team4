@@ -504,7 +504,7 @@ plt.scatter(*zip(*fitted_actual))
 plt.xlabel('Predicted value')
 plt.ylabel('Actual value')
 if create_output:
-    plt.savefig("generated/"+title+".png")
+    plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
 bar_color = (0.2, 0.4, 0.6, 0.6)
@@ -526,7 +526,7 @@ plt.title(title)
 plt.xlabel("level of " + titles[h])
 plt.ylabel('Effect with confidence interval')
 if create_output:
-    plt.savefig("generated/"+title+".png")
+    plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
 h = 1
@@ -546,7 +546,7 @@ plt.title(title)
 plt.xlabel("level of " + titles[h])
 plt.ylabel('Effect with confidence interval')
 if create_output:
-    plt.savefig("generated/"+title+".png")
+    plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
 h = 2
@@ -566,12 +566,12 @@ plt.title(title)
 plt.xlabel("level of " + titles[h])
 plt.ylabel('Effect with confidence interval')
 if create_output:
-    plt.savefig("generated/"+title+".png")
+    plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
 g = 0
 h = 1
-title = "Effect of interaction between " + titles[g] + " and " + titles[h]
+title = "Effect of interaction between \n" + titles[g] + " and " + titles[h]
 x = []
 y = []
 for i in range(0, a):
@@ -594,12 +594,12 @@ plt.title(title)
 plt.xlabel("level of " + titles[g] + " x level of " + titles[h])
 plt.ylabel('Effect of interaction with confidence interval')
 if create_output:
-    plt.savefig("generated/"+title+".png")
+    plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
 g = 0
 h = 2
-title = "Effect of interaction between " + titles[g] + " and " + titles[h]
+title = "Effect of interaction between \n" + titles[g] + " and " + titles[h]
 x = []
 y = []
 for i in range(0, a):
@@ -622,12 +622,12 @@ plt.title(title)
 plt.xlabel("level of " + titles[g] + " x level of " + titles[h])
 plt.ylabel('Effect of interaction with confidence interval')
 if create_output:
-    plt.savefig("generated/"+title+".png")
+    plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
 g = 1
 h = 2
-title="Effect of interaction between " + titles[g] + " and " + titles[h]
+title="Effect of interaction between \n" + titles[g] + " and " + titles[h]
 x = []
 y = []
 for j in range(0, b):
@@ -650,7 +650,7 @@ plt.title(title)
 plt.xlabel("level of " + titles[g] + " x level of " + titles[h])
 plt.ylabel('Effect of interaction with confidence interval')
 if create_output:
-    plt.savefig("generated/"+title+".png")
+    plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
 title="Effect of interaction between " + titles[0] + ",\n " + titles[1] + " and\n " + titles[2]
@@ -677,7 +677,7 @@ plt.title(title)
 plt.xlabel("level of " + titles[0] + "\n x level of " + titles[1] + "\n x level of " + titles[2])
 plt.ylabel('Effect of interaction with confidence interval')
 if create_output:
-    plt.savefig("generated/"+title.replace("\n","")+".png")
+    plt.savefig("generated/"+title.replace("\n", "").replace(" ", "_")+".png")
     plt.show()
 
 
